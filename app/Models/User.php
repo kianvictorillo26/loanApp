@@ -14,7 +14,27 @@ class User extends Authenticatable
 
     protected $fillable = [
         'name',
+        'username',
+        'account_type',
+        'address',
+        'gender',
+        'birthday',
+        'age',
         'email',
+        'contact_number',
+        'bank_name',
+        'bank_account_number',
+        'card_holder_name',
+        'tin_number',
+        'company_name',
+        'company_address',
+        'company_phone',
+        'position',
+        'monthly_earnings',
+        'proof_of_billing',
+        'valid_id',
+        'coe',
+        'status',
         'password',
     ];
 
