@@ -7,12 +7,11 @@ use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rules;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
+use Illuminate\Validation\Rules\Password;
 
 class RegisteredUserController extends Controller
 {
@@ -47,7 +46,7 @@ class RegisteredUserController extends Controller
             'gender' => 'nullable|in:Male,Female,Other',
             'birthday' => 'required|date|before:today',
             'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
-            'contact_number' => 'required|string|regex:/^(\+63|0)[0-9]{10}$/',
+            'contact_number' => 'required|string|regex:/^[0-9+\-\s()]{10,15}$/',
             'bank_name' => 'required|string',
             'bank_account_number' => 'required|string',
             'card_holder_name' => 'required|string',
@@ -60,7 +59,7 @@ class RegisteredUserController extends Controller
             'proof_of_billing' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
             'valid_id' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
             'coe' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'password' => ['required', 'confirmed', Password::min(8)->letters()->mixedCase()->numbers()->symbols()],
         ]);
 
         // Calculate age

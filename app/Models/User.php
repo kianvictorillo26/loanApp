@@ -35,6 +35,7 @@ class User extends Authenticatable
         'valid_id',
         'coe',
         'status',
+        'is_admin',
         'password',
     ];
 
@@ -47,13 +48,23 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
+            'is_admin' => 'boolean',
             'password' => 'hashed',
         ];
     }
 
-    
     public function loans()
     {
         return $this->hasMany(Loan::class);
+    }
+
+    public function savings()
+    {
+        return $this->hasOne(Savings::class);
+    }
+
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class);
     }
 }
