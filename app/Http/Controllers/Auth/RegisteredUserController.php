@@ -46,7 +46,7 @@ class RegisteredUserController extends Controller
             'gender' => 'nullable|in:Male,Female,Other',
             'birthday' => 'required|date|before:today',
             'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
-            'contact_number' => 'required|string|regex:/^[0-9+\-\s()]{10,15}$/',
+            'contact_number' => ['required', 'string', 'regex:/^09[0-9]{9}$/'],
             'bank_name' => 'required|string',
             'bank_account_number' => 'required|string',
             'card_holder_name' => 'required|string',

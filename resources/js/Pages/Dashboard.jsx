@@ -171,18 +171,8 @@ export default function Dashboard({ userStats, recentTransactions, currentBill, 
                 </div>
 
                 {/* Quick Actions */}
-                <div className="mb-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                    <Link
-                        href={route('user.loans.index')}
-                        className="flex flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white px-4 py-6 transition hover:shadow-lg hover:border-emerald-200"
-                    >
-                        <svg className="h-8 w-8 text-emerald-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <span className="text-sm font-semibold text-slate-700">Loans</span>
-                    </Link>
-
-                    {user.account_type?.toLowerCase() === 'premium' && (
+                {user.account_type?.toLowerCase() === 'premium' && (
+                    <div className="mb-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                         <Link
                             href={route('user.savings.index')}
                             className="flex flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white px-4 py-6 transition hover:shadow-lg hover:border-emerald-200"
@@ -192,28 +182,8 @@ export default function Dashboard({ userStats, recentTransactions, currentBill, 
                             </svg>
                             <span className="text-sm font-semibold text-slate-700">Savings</span>
                         </Link>
-                    )}
-
-                    <Link
-                        href={route('user.billing.index')}
-                        className="flex flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white px-4 py-6 transition hover:shadow-lg hover:border-emerald-200"
-                    >
-                        <svg className="h-8 w-8 text-emerald-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                        <span className="text-sm font-semibold text-slate-700">Billing</span>
-                    </Link>
-
-                    <Link
-                        href={route('user.transactions.index')}
-                        className="flex flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white px-4 py-6 transition hover:shadow-lg hover:border-emerald-200"
-                    >
-                        <svg className="h-8 w-8 text-emerald-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-                        </svg>
-                        <span className="text-sm font-semibold text-slate-700">Transactions</span>
-                    </Link>
-                </div>
+                    </div>
+                )}
 
                 {/* Recent Transactions */}
                 <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-lg shadow-slate-200/50">

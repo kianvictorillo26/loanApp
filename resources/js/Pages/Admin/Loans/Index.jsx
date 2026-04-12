@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 
@@ -7,25 +8,52 @@ export default function LoansIndex({ loans }) {
         term_months: '',
         reason: '',
     });
+    const [rejectReasons, setRejectReasons] = useState({});
+
+    const handleRejectReasonChange = (loanId, value) => {
+        setRejectReasons((prev) => ({
+            ...prev,
+            [loanId]: value,
+        }));
+    };
 
     const approveLoan = (loanId) => {
+        if (!data.interest_rate || !data.term_months) {
+            alert('Please enter both interest rate and term months before approving a loan.');
+            return;
+        }
+
         post(route('admin.loans.approve', loanId), {
             data: {
                 interest_rate: data.interest_rate,
                 term_months: data.term_months,
             },
             preserveScroll: true,
+            onSuccess: () => {
+                setData('interest_rate', '');
+                setData('term_months', '');
+            },
         });
     };
 
     const rejectLoan = (loanId) => {
-        const reason = prompt('Rejection reason:');
-        if (reason) {
-            post(route('admin.loans.reject', loanId), {
-                data: { reason },
-                preserveScroll: true,
-            });
+        const reason = (rejectReasons[loanId] ?? '').trim();
+
+        if (!reason) {
+            alert('Please enter a rejection reason before rejecting this loan.');
+            return;
         }
+
+        post(route('admin.loans.reject', loanId), {
+            data: { reason },
+            preserveScroll: true,
+            onSuccess: () => {
+                setRejectReasons((prev) => ({
+                    ...prev,
+                    [loanId]: '',
+                }));
+            },
+        });
     };
 
     return (
@@ -171,20 +199,29 @@ export default function LoansIndex({ loans }) {
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                                         {loan.status === 'pending' && (
-                                                            <div className="flex items-center gap-3">
-                                                                <button
-                                                                    onClick={() => approveLoan(loan.id)}
-                                                                    className="inline-flex items-center rounded-2xl bg-green-600 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-green-700 transition disabled:opacity-50"
-                                                                    disabled={processing}
-                                                                >
-                                                                    ✓ Approve
-                                                                </button>
-                                                                <button
-                                                                    onClick={() => rejectLoan(loan.id)}
-                                                                    className="inline-flex items-center rounded-2xl bg-red-600 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-red-700 transition"
-                                                                >
-                                                                    ✗ Reject
-                                                                </button>
+                                                            <div className="space-y-2">
+                                                                <div className="flex items-center gap-3">
+                                                                    <button
+                                                                        onClick={() => approveLoan(loan.id)}
+                                                                        className="inline-flex items-center rounded-2xl bg-green-600 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-green-700 transition disabled:opacity-50"
+                                                                        disabled={processing}
+                                                                    >
+                                                                        ✓ Approve
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={() => rejectLoan(loan.id)}
+                                                                        className="inline-flex items-center rounded-2xl bg-red-600 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-red-700 transition"
+                                                                    >
+                                                                        ✗ Reject
+                                                                    </button>
+                                                                </div>
+                                                                <input
+                                                                    type="text"
+                                                                    value={rejectReasons[loan.id] ?? ''}
+                                                                    onChange={(e) => handleRejectReasonChange(loan.id, e.target.value)}
+                                                                    placeholder="Rejection reason"
+                                                                    className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-700 focus:border-red-500 focus:ring-red-500 transition"
+                                                                />
                                                             </div>
                                                         )}
                                                     </td>

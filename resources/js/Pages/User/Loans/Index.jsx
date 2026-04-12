@@ -188,7 +188,7 @@ export default function LoansIndex({ loans, maxLoanAmount, currentTotalLoan }) {
 
                 {/* Important Information Box */}
                 <div className="mt-10 rounded-3xl border border-blue-200 bg-blue-50 p-6 sm:p-8">
-                    <h3 className="text-lg font-semibold text-blue-900 mb-4">📋 Loan Information</h3>
+                    <h3 className="text-lg font-semibold text-blue-900 mb-4"> Loan Information</h3>
                     <ul className="space-y-2 text-sm text-blue-800">
                         <li>• Minimum loan amount: ₱5,000</li>
                         <li>• Maximum loan amount: ₱10,000 per application</li>

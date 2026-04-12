@@ -130,6 +130,9 @@ class AdminDashboardController extends Controller
         $totalAmount = $loan->calculateTotalAmount();
         $monthlyPayment = $loan->calculateMonthlyPayment();
 
+        $disbursementDate = now();
+        $dueDate = $disbursementDate->copy()->addMonth();
+
         $loan->update([
             'status' => 'approved',
             'interest_rate' => $request->interest_rate,
@@ -138,6 +141,8 @@ class AdminDashboardController extends Controller
             'monthly_payment' => $monthlyPayment,
             'remaining_balance' => $totalAmount,
             'approved_at' => now(),
+            'disbursement_date' => $disbursementDate,
+            'due_date' => $dueDate,
         ]);
 
         // Create transaction record for loan disbursement

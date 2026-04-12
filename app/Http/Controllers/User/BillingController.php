@@ -13,9 +13,11 @@ class BillingController extends Controller
     {
         $user = Auth::user();
         
-        // Get current billing (most recent approved loan)
+        // Get current billing (most recent approved loan with disbursement info)
         $activeLoan = Loan::where('user_id', $user->id)
             ->where('status', 'approved')
+            ->whereNotNull('disbursement_date')
+            ->whereNotNull('due_date')
             ->orderBy('disbursement_date', 'desc')
             ->first();
 
@@ -44,11 +46,15 @@ class BillingController extends Controller
                 ->get();
 
             foreach ($approvedLoans as $loan) {
+                if (! $loan->disbursement_date || ! $loan->due_date) {
+                    continue;
+                }
+
                 for ($i = 0; $i < $loan->term_months; $i++) {
                     $billingHistory[] = [
                         'id' => $loan->id . '_' . $i,
-                        'billing_date' => $loan->disbursement_date->addMonths($i),
-                        'due_date' => $loan->due_date->addMonths($i),
+                        'billing_date' => $loan->disbursement_date->copy()->addMonths($i),
+                        'due_date' => $loan->due_date->copy()->addMonths($i),
                         'loan_amount' => $loan->amount,
                         'amount_received' => $loan->amount - ($loan->amount * 0.03),
                         'base_amount' => $loan->monthly_payment,

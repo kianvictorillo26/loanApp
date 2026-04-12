@@ -110,7 +110,7 @@ export default function Register() {
                                     
                                     {/* Helpful Guide Section */}
                                     <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
-                                        <p className="text-sm text-blue-900 font-semibold">📋 Quick Guide:</p>
+                                        <p className="text-sm text-blue-900 font-semibold"> Quick Guide:</p>
                                         <ul className="text-sm text-blue-800 mt-2 space-y-1">
                                             <li>✓ Have your ID, bank card, and employment documents ready</li>
                                             <li>✓ Use your correct legal name as shown in your ID</li>
@@ -182,7 +182,7 @@ export default function Register() {
                                                     onChange={(e) => setData('username', e.target.value)}
                                                     required
                                                 />
-                                                <p className="text-xs text-gray-500 mt-1">💡 At least 6 characters. Use letters, numbers, and underscores only</p>
+                                                <p className="text-xs text-gray-500 mt-1"> At least 6 characters. Use letters, numbers, and underscores only</p>
                                                 <InputError message={errors.username} className="mt-2" />
                                             </div>
 
@@ -199,7 +199,7 @@ export default function Register() {
                                                     onChange={(e) => setData('email', e.target.value)}
                                                     required
                                                 />
-                                                <p className="text-xs text-gray-500 mt-1">💡 We'll use this to send you updates about your loan application</p>
+                                                <p className="text-xs text-gray-500 mt-1"> We'll use this to send you updates about your loan application</p>
                                                 <InputError message={errors.email} className="mt-2" />
                                             </div>
 
@@ -207,14 +207,19 @@ export default function Register() {
                                                 <InputLabel htmlFor="contact_number" value="Contact Number" />
                                                 <TextInput
                                                     id="contact_number"
-                                                    type="text"
+                                                    type="tel"
                                                     name="contact_number"
                                                     value={data.contact_number}
                                                     className="mt-1 block w-full"
-                                                    placeholder="e.g., 09123456789 or +639123456789"
+                                                    placeholder="e.g., 09123456789"
+                                                    pattern="^09[0-9]{9}$"
+                                                    title="Enter an 11-digit Philippine mobile number like 09123456789"
+                                                    maxLength={11}
+                                                    inputMode="numeric"
                                                     onChange={(e) => setData('contact_number', e.target.value)}
                                                     required
                                                 />
+                                                <p className="text-xs text-gray-500 mt-1">Use an 11-digit Philippine mobile number starting with 09.</p>
                                                 <InputError message={errors.contact_number} className="mt-2" />
                                             </div>
 
@@ -246,7 +251,7 @@ export default function Register() {
                                                     onChange={handleBirthdayChange}
                                                     required
                                                 />
-                                                <p className="text-xs text-gray-500 mt-1">💡 Click the calendar icon to select your date. Your age will calculate automatically</p>
+                                                <p className="text-xs text-gray-500 mt-1"> Click the calendar icon to select your date. Your age will calculate automatically</p>
                                                 <InputError message={errors.birthday} className="mt-2" />
                                             </div>
 
@@ -276,7 +281,7 @@ export default function Register() {
                                                 onChange={(e) => setData('address', e.target.value)}
                                                 required
                                             />
-                                            <p className="text-xs text-gray-500 mt-1">💡 Include street number, barangay, city, and zip code. This must match your ID</p>
+                                            <p className="text-xs text-gray-500 mt-1"> Include street number, barangay, city, and zip code. This must match your ID</p>
                                             <InputError message={errors.address} className="mt-2" />
                                         </div>
                                     </div>
@@ -299,7 +304,7 @@ export default function Register() {
                                                     onChange={(e) => setData('bank_name', e.target.value)}
                                                     required
                                                 />
-                                                <p className="text-xs text-gray-500 mt-1">💡 Look at your bank card or passbook to find this</p>
+                                                <p className="text-xs text-gray-500 mt-1"> Look at your bank card or passbook to find this</p>
                                                 <InputError message={errors.bank_name} className="mt-2" />
                                             </div>
 
@@ -314,7 +319,7 @@ export default function Register() {
                                                     onChange={(e) => setData('bank_account_number', e.target.value)}
                                                     required
                                                 />
-                                                <p className="text-xs text-gray-500 mt-1">💡 Usually 10-16 digits found at the bottom of your bank card</p>
+                                                <p className="text-xs text-gray-500 mt-1"> Usually 10-16 digits found at the bottom of your bank card</p>
                                                 <InputError message={errors.bank_account_number} className="mt-2" />
                                             </div>
 
@@ -328,7 +333,7 @@ export default function Register() {
                                                     onChange={(e) => setData('card_holder_name', e.target.value)}
                                                     required
                                                 />
-                                                <p className="text-sm text-amber-600 mt-1">⚠️ Please ensure the card holder's name is correct to avoid transaction interruptions.</p>
+                                                <p className="text-sm text-amber-600 mt-1"> Please ensure the card holder's name is correct to avoid transaction interruptions.</p>
                                                 <InputError message={errors.card_holder_name} className="mt-2" />
                                             </div>
 
@@ -343,7 +348,7 @@ export default function Register() {
                                                     onChange={(e) => setData('tin_number', e.target.value)}
                                                     required
                                                 />
-                                                <p className="text-xs text-gray-500 mt-1">💡 Your Tax ID from BIR, or your SSS/GSIS number if you don't have one</p>
+                                                <p className="text-xs text-gray-500 mt-1"> Your Tax ID from BIR, or your SSS/GSIS number if you don't have one</p>
                                                 <InputError message={errors.tin_number} className="mt-2" />
                                             </div>
                                         </div>
@@ -367,6 +372,19 @@ export default function Register() {
                                                     required
                                                 />
                                                 <InputError message={errors.company_name} className="mt-2" />
+                                            </div>
+
+                                            <div>
+                                                <InputLabel htmlFor="employer" value="Employer Name" />
+                                                <TextInput
+                                                    id="employer"
+                                                    name="employer"
+                                                    value={data.employer}
+                                                    className="mt-1 block w-full"
+                                                    onChange={(e) => setData('employer', e.target.value)}
+                                                    required
+                                                />
+                                                <InputError message={errors.employer} className="mt-2" />
                                             </div>
 
                                             <div>
@@ -395,7 +413,7 @@ export default function Register() {
                                                     onChange={(e) => setData('monthly_earnings', e.target.value)}
                                                     required
                                                 />
-                                                <p className="text-xs text-gray-500 mt-1">💡 Your gross monthly salary from your payslip or employment contract</p>
+                                                <p className="text-xs text-gray-500 mt-1"> Your gross monthly salary from your payslip or employment contract</p>
                                                 <InputError message={errors.monthly_earnings} className="mt-2" />
                                             </div>
 
@@ -409,7 +427,7 @@ export default function Register() {
                                                     onChange={(e) => setData('company_phone', e.target.value)}
                                                     required
                                                 />
-                                                <p className="text-sm text-amber-600 mt-1">📞 Please provide a number directed to your HR to confirm employment.</p>
+                                                <p className="text-sm text-amber-600 mt-1"> Please provide a number directed to your HR to confirm employment.</p>
                                                 <InputError message={errors.company_phone} className="mt-2" />
                                             </div>
                                         </div>
@@ -426,7 +444,7 @@ export default function Register() {
                                                 onChange={(e) => setData('company_address', e.target.value)}
                                                 required
                                             />
-                                            <p className="text-xs text-gray-500 mt-1">💡 The complete physical address of your workplace</p>
+                                            <p className="text-xs text-gray-500 mt-1"> The complete physical address of your workplace</p>
                                             <InputError message={errors.company_address} className="mt-2" />
                                         </div>
                                     </div>
@@ -449,7 +467,7 @@ export default function Register() {
                                                     onChange={(e) => setData('proof_of_billing', e.target.files[0])}
                                                     required
                                                 />
-                                                <p className="text-xs text-gray-500 mt-1">💡 Electric, water, or internet bill from the last 3 months showing your name and address</p>
+                                                <p className="text-xs text-gray-500 mt-1"> Electric, water, or internet bill from the last 3 months showing your name and address</p>
                                                 <InputError message={errors.proof_of_billing} className="mt-2" />
                                             </div>
 
@@ -464,7 +482,7 @@ export default function Register() {
                                                     onChange={(e) => setData('valid_id', e.target.files[0])}
                                                     required
                                                 />
-                                                <p className="text-xs text-gray-500 mt-1">💡 Your Driver's License, Passport, SSS, GSIS, or PRC ID (both front and back)</p>
+                                                <p className="text-xs text-gray-500 mt-1"> Your Driver's License, Passport, SSS, GSIS, or PRC ID (both front and back)</p>
                                                 <InputError message={errors.valid_id} className="mt-2" />
                                             </div>
 
@@ -479,7 +497,7 @@ export default function Register() {
                                                     onChange={(e) => setData('coe', e.target.files[0])}
                                                     required
                                                 />
-                                                <p className="text-xs text-gray-500 mt-1">💡 Official letter from your company on company letterhead showing you are employed and your salary</p>
+                                                <p className="text-xs text-gray-500 mt-1"> Official letter from your company on company letterhead showing you are employed and your salary</p>
                                                 <InputError message={errors.coe} className="mt-2" />
                                             </div>
                                         </div>
@@ -539,7 +557,7 @@ export default function Register() {
                                                     }
                                                     required
                                                 />
-                                                <p className="text-xs text-gray-500 mt-1">💡 Type the same password again to confirm it's correct</p>
+                                                <p className="text-xs text-gray-500 mt-1"> Type the same password again to confirm it's correct</p>
                                                 <InputError
                                                     message={errors.password_confirmation}
                                                     className="mt-2"

@@ -46,26 +46,6 @@ export default function AdminDashboard({ pendingUsers, pendingLoans, pendingWith
                                 Manage registrations, loan approvals, savings activity, and reports from one place.
                             </p>
                         </div>
-                        <div className="grid gap-3">
-                            <Link
-                                href={route('admin.loans.index')}
-                                className="inline-flex w-full items-center justify-center rounded-2xl bg-slate-800 px-4 py-4 text-sm font-semibold text-white transition hover:bg-slate-700"
-                            >
-                                Loans
-                            </Link>
-                            <Link
-                                href={route('admin.reports.index')}
-                                className="inline-flex w-full items-center justify-center rounded-2xl bg-slate-800/80 px-4 py-4 text-sm font-semibold text-white transition hover:bg-slate-700"
-                            >
-                                Reports
-                            </Link>
-                            <Link
-                                href={route('admin.users.index')}
-                                className="inline-flex w-full items-center justify-center rounded-2xl bg-slate-800/80 px-4 py-4 text-sm font-semibold text-white transition hover:bg-slate-700"
-                            >
-                                Users
-                            </Link>
-                        </div>
                     </div>
                 </div>
             </div>
