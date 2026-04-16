@@ -14,84 +14,98 @@ class BillingController extends Controller
         $user = Auth::user();
         
         // Get current billing (most recent approved loan with disbursement info)
-        $activeLoan = Loan::where('user_id', $user->id)
+        $approvedLoans = Loan::where('user_id', $user->id)
             ->where('status', 'approved')
             ->whereNotNull('disbursement_date')
-            ->whereNotNull('due_date')
             ->orderBy('disbursement_date', 'desc')
-            ->first();
+            ->get();
 
         $currentBilling = null;
-        $billingHistory = [];
+        $billingHistory = collect();
 
-        if ($activeLoan) {
-            // Generate billing information
-            $currentBilling = [
-                'id' => $activeLoan->id,
-                'billing_date' => $activeLoan->disbursement_date,
-                'due_date' => $activeLoan->due_date,
-                'loan_amount' => $activeLoan->amount,
-                'amount_received' => $activeLoan->amount - ($activeLoan->amount * 0.03),
-                'base_amount' => $activeLoan->monthly_payment,
-                'interest_amount' => $activeLoan->amount * (0.03 / 12),
-                'penalty_amount' => 0, // Would be determined by payment history
-                'total_amount' => $activeLoan->monthly_payment,
-                'status' => $this->determineBillingStatus($activeLoan),
-            ];
+        foreach ($approvedLoans as $loan) {
+            if (! $loan->disbursement_date || ! $loan->term_months) {
+                continue;
+            }
 
-            // Get all billing history from approved loans
-            $approvedLoans = Loan::where('user_id', $user->id)
-                ->where('status', 'approved')
-                ->orderBy('disbursement_date', 'desc')
-                ->get();
+            $monthlyPrincipal = round($loan->amount / $loan->term_months, 2);
+            $monthlyInterest = round(($loan->amount * ($loan->interest_rate / 100)) / $loan->term_months, 2);
+            $amountReceived = round($loan->amount - ($loan->amount * ($loan->interest_rate / 100)), 2);
 
-            foreach ($approvedLoans as $loan) {
-                if (! $loan->disbursement_date || ! $loan->due_date) {
-                    continue;
-                }
+            for ($i = 0; $i < $loan->term_months; $i++) {
+                $billingDate = $loan->disbursement_date->copy()->addDays(28 * $i);
+                $dueDate = $billingDate->copy()->addDays(28);
+                $isOverdue = now()->greaterThan($dueDate);
+                $penaltyAmount = $isOverdue ? round(($monthlyPrincipal + $monthlyInterest) * 0.02, 2) : 0;
 
-                for ($i = 0; $i < $loan->term_months; $i++) {
-                    $billingHistory[] = [
-                        'id' => $loan->id . '_' . $i,
-                        'billing_date' => $loan->disbursement_date->copy()->addMonths($i),
-                        'due_date' => $loan->due_date->copy()->addMonths($i),
-                        'loan_amount' => $loan->amount,
-                        'amount_received' => $loan->amount - ($loan->amount * 0.03),
-                        'base_amount' => $loan->monthly_payment,
-                        'interest_amount' => $loan->amount * (0.03 / 12),
-                        'penalty_amount' => 0,
-                        'total_amount' => $loan->monthly_payment,
-                        'status' => 'pending',
-                    ];
-                }
+                $billingHistory->push([
+                    'id' => $loan->id . '_' . $i,
+                    'loan_id' => $loan->id,
+                    'billing_date' => $billingDate,
+                    'due_date' => $dueDate,
+                    'loan_amount' => $loan->amount,
+                    'amount_received' => $amountReceived,
+                    'base_amount' => $monthlyPrincipal,
+                    'interest_amount' => $monthlyInterest,
+                    'penalty_amount' => $penaltyAmount,
+                    'total_amount' => round($monthlyPrincipal + $monthlyInterest + $penaltyAmount, 2),
+                    'status' => $isOverdue ? 'overdue' : 'pending',
+                    'account_type' => $user->account_type,
+                ]);
             }
         }
+
+        $billingHistory = $billingHistory->sortByDesc('billing_date')->values()->all();
+        $currentBilling = collect($billingHistory)->firstWhere('status', 'pending') ?? collect($billingHistory)->firstWhere('status', 'overdue');
 
         return Inertia::render('User/Billing/Index', [
             'currentBilling' => $currentBilling,
             'billingHistory' => $billingHistory,
-            'loanInfo' => $activeLoan,
+            'loanInfo' => $approvedLoans->first(),
         ]);
     }
 
     public function show($id)
     {
         $user = Auth::user();
-        
-        $loan = Loan::where('user_id', $user->id)->findOrFail($id);
 
-        // Build billing statement
+        $parts = explode('_', $id);
+        if (count($parts) !== 2) {
+            abort(404);
+        }
+
+        $loanId = $parts[0];
+        $periodIndex = (int) $parts[1];
+
+        $loan = Loan::where('user_id', $user->id)
+            ->where('status', 'approved')
+            ->whereNotNull('disbursement_date')
+            ->findOrFail($loanId);
+
+        if ($periodIndex < 0 || $periodIndex >= $loan->term_months) {
+            abort(404);
+        }
+
+        $monthlyPrincipal = round($loan->amount / $loan->term_months, 2);
+        $monthlyInterest = round(($loan->amount * ($loan->interest_rate / 100)) / $loan->term_months, 2);
+        $amountReceived = round($loan->amount - ($loan->amount * ($loan->interest_rate / 100)), 2);
+
+        $billingDate = $loan->disbursement_date->copy()->addDays(28 * $periodIndex);
+        $dueDate = $billingDate->copy()->addDays(28);
+        $isOverdue = now()->greaterThan($dueDate);
+        $penaltyAmount = $isOverdue ? round(($monthlyPrincipal + $monthlyInterest) * 0.02, 2) : 0;
+
         $billing = [
-            'id' => $loan->id,
-            'billing_date' => $loan->disbursement_date,
-            'due_date' => $loan->due_date,
+            'id' => $loan->id . '_' . $periodIndex,
+            'billing_date' => $billingDate,
+            'due_date' => $dueDate,
             'loan_amount' => $loan->amount,
-            'amount_received' => $loan->amount - ($loan->amount * 0.03),
-            'base_amount' => $loan->monthly_payment,
-            'interest_amount' => $loan->amount * (0.03 / 12),
-            'penalty_amount' => 0,
-            'total_amount' => $loan->monthly_payment,
-            'status' => $this->determineBillingStatus($loan),
+            'amount_received' => $amountReceived,
+            'base_amount' => $monthlyPrincipal,
+            'interest_amount' => $monthlyInterest,
+            'penalty_amount' => $penaltyAmount,
+            'total_amount' => round($monthlyPrincipal + $monthlyInterest + $penaltyAmount, 2),
+            'status' => $isOverdue ? 'overdue' : 'pending',
             'account_type' => $user->account_type,
         ];
 

@@ -59,21 +59,12 @@ class LoanController extends Controller
             return back()->with('error', 'Loan exceeds maximum allowed amount');
         }
 
-        // Check if user already has pending loan
-        $pendingLoan = Loan::where('user_id', $user->id)
-            ->where('status', 'pending')
-            ->first();
-        
-        if ($pendingLoan) {
-            return back()->with('error', 'Please wait for your pending loan to be approved');
-        }
-
         // Calculate loan details
         $amount = $validated['amount'];
         $term = $validated['term'];
         $interest = $amount * (self::INTEREST_RATE / 100);
         $totalAmount = $amount + $interest;
-        $monthlyPayment = $amount / $term;
+        $monthlyPayment = round($amount / $term, 2);
         
         // Create loan
         $loan = Loan::create([
@@ -91,14 +82,14 @@ class LoanController extends Controller
             'purpose' => $validated['purpose'] ?? null,
         ]);
 
-        // Create transaction record
+        // Create loan application transaction record
         Transaction::create([
             'user_id' => $user->id,
             'loan_id' => $loan->id,
             'type' => 'loan_application',
             'amount' => $amount,
             'status' => 'pending',
-            'reference_number' => 'TXN' . date('Ymd') . str_pad($loan->id, 6, '0', STR_PAD_LEFT),
+            'notes' => 'Loan application submitted and awaiting admin review.',
             'transaction_date' => now(),
         ]);
 

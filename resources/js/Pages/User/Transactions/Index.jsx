@@ -38,6 +38,7 @@ export default function TransactionsIndex({ transactions }) {
         withdrawal: { bg: 'bg-red-100', text: 'text-red-800', icon: 'text-red-600' },
         loan_disbursement: { bg: 'bg-blue-100', text: 'text-blue-800', icon: 'text-blue-600' },
         loan_payment: { bg: 'bg-purple-100', text: 'text-purple-800', icon: 'text-purple-600' },
+        money_earned: { bg: 'bg-amber-100', text: 'text-amber-800', icon: 'text-amber-600' },
         interest: { bg: 'bg-orange-100', text: 'text-orange-800', icon: 'text-orange-600' },
         penalty: { bg: 'bg-red-100', text: 'text-red-800', icon: 'text-red-600' },
     };
@@ -99,6 +100,7 @@ export default function TransactionsIndex({ transactions }) {
                                 <option value="withdrawal">Withdrawals Only</option>
                                 <option value="loan_disbursement">Loan Disbursements</option>
                                 <option value="loan_payment">Loan Payments</option>
+                                <option value="money_earned">Money Earned</option>
                                 <option value="interest">Interest Charges</option>
                                 <option value="penalty">Penalties</option>
                             </select>
@@ -186,7 +188,7 @@ export default function TransactionsIndex({ transactions }) {
                                                 </td>
                                                 <td className="px-6 py-4 sm:px-8">
                                                     <p className="text-sm font-semibold text-slate-900">
-                                                        {['deposit', 'loan_disbursement', 'interest', 'penalty'].includes(transaction.type) ? '+' : '-'}
+                                                        {['deposit', 'loan_disbursement', 'interest', 'penalty', 'money_earned'].includes(transaction.type) ? '+' : '-'}
                                                         {formatCurrency(transaction.amount)}
                                                     </p>
                                                     {transaction.balance_after !== null && (
@@ -222,7 +224,7 @@ export default function TransactionsIndex({ transactions }) {
 
                 {/* Legend */}
                 <div className="mt-10 rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 shadow-lg shadow-slate-200/50">
-                    <h3 className="text-lg font-semibold text-slate-900 mb-4">📋 Transaction Types</h3>
+                    <h3 className="text-lg font-semibold text-slate-900 mb-4"> Transaction Types</h3>
                     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                         <div className="flex items-center gap-3">
                             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-100">
@@ -255,6 +257,14 @@ export default function TransactionsIndex({ transactions }) {
                                 </svg>
                             </div>
                             <span className="text-sm text-slate-700">Loan Payment - Monthly loan payment</span>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-100">
+                                <svg className="h-4 w-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <span className="text-sm text-slate-700">Money Earned - Premium income added to savings</span>
                         </div>
                         <div className="flex items-center gap-3">
                             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-orange-100">

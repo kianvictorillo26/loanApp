@@ -61,12 +61,13 @@ export default function WithdrawRequest({ savingsBalance, currentBalance, minWit
                         <div className="rounded-lg border border-red-200 bg-red-50 p-3">
                             <p className="text-sm font-semibold text-red-700">
                                 {remainingWithdrawalsToday === 0 
-                                    ? '❌ You have reached the maximum withdrawals for today' 
-                                    : '❌ Insufficient balance for withdrawal'}
+                                    ? ' You have reached the maximum withdrawals for today' 
+                                    : ' Insufficient balance for withdrawal'}
                             </p>
                         </div>
                     )}
                 </div>
+
 
                 {canWithdraw ? (
                     <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white p-8 shadow-lg shadow-slate-200/50">
@@ -127,7 +128,7 @@ export default function WithdrawRequest({ savingsBalance, currentBalance, minWit
 
                             {/* Info Box */}
                             <div className="rounded-2xl border border-blue-200 bg-blue-50 p-6">
-                                <h3 className="text-sm font-semibold text-blue-900 mb-3">ℹ️ Withdrawal Process</h3>
+                                <h3 className="text-sm font-semibold text-blue-900 mb-3">Withdrawal Process</h3>
                                 <ul className="space-y-2 text-xs text-blue-800">
                                     <li>• Withdrawal requests must be approved by admin</li>
                                     <li>• Maximum 5 withdrawal requests per day</li>

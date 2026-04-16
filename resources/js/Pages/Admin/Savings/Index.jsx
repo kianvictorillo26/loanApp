@@ -1,12 +1,17 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, router, useForm } from '@inertiajs/react';
 
-export default function SavingsIndex({ savings, pendingWithdrawals }) {
+export default function SavingsIndex({ savings, transactions }) {
     const { data, setData, post, processing, errors } = useForm({
         amount: '',
         notes: '',
         reason: '',
     });
+
+    const formatCurrency = (value) =>
+        value !== null && value !== undefined
+            ? Number(value).toLocaleString('en-US', { style: 'currency', currency: 'PHP' })
+            : '₱0.00';
 
     const deposit = (savingsId) => {
         post(route('admin.savings.deposit', savingsId), {
@@ -21,17 +26,24 @@ export default function SavingsIndex({ savings, pendingWithdrawals }) {
     const approveWithdrawal = (transactionId) => {
         post(route('admin.withdrawals.approve', transactionId), {
             preserveScroll: true,
+            onSuccess: () => router.reload(),
+            onError: () => alert('Unable to approve withdrawal. Please try again.'),
         });
     };
 
     const rejectWithdrawal = (transactionId) => {
         const reason = prompt('Rejection reason:');
-        if (reason) {
-            post(route('admin.withdrawals.reject', transactionId), {
-                data: { reason },
-                preserveScroll: true,
-            });
+        if (!reason || !reason.trim()) {
+            alert('Please enter a valid rejection reason.');
+            return;
         }
+
+        post(route('admin.withdrawals.reject', transactionId), {
+            data: { reason: reason.trim() },
+            preserveScroll: true,
+            onSuccess: () => router.reload(),
+            onError: () => alert('Unable to reject withdrawal. Please try again.'),
+        });
     };
 
     return (
@@ -211,74 +223,91 @@ export default function SavingsIndex({ savings, pendingWithdrawals }) {
                         </div>
                     </div>
 
-                    {/* Pending Withdrawals */}
-                    {pendingWithdrawals && pendingWithdrawals.length > 0 && (
-                        <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-gradient-to-br from-white to-slate-50 shadow-xl shadow-slate-200/50">
-                            <div className="absolute -right-8 -top-8 h-32 w-32 rounded-full bg-orange-100/60 blur-3xl" />
-                            <div className="relative px-8 py-6 border-b border-slate-200 bg-gradient-to-r from-orange-50/80 to-slate-50/80">
-                                <div className="flex items-center gap-3">
-                                    <div className="flex h-8 w-8 items-center justify-center rounded-2xl bg-orange-100 text-orange-600">
-                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-                                        </svg>
-                                    </div>
-                                    <h3 className="text-lg font-semibold text-slate-900">Pending Withdrawals</h3>
-                                    <span className="rounded-full bg-orange-100 px-3 py-1 text-sm font-semibold text-orange-700">
-                                        {pendingWithdrawals.length}
-                                    </span>
-                                </div>
-                            </div>
-                            <div className="relative p-8">
-                                <div className="space-y-6">
-                                    {pendingWithdrawals.map((transaction) => (
-                                        <div key={transaction.id} className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-6 shadow-lg shadow-slate-200/50">
-                                            <div className="absolute -right-4 -top-4 h-16 w-16 rounded-full bg-orange-100/60 blur-2xl" />
-                                            <div className="relative">
-                                                <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
-                                                    <div className="flex-1">
-                                                        <div className="mb-4">
-                                                            <h4 className="text-lg font-semibold text-slate-900">{transaction.user.name}</h4>
-                                                            <p className="text-sm text-slate-500">{transaction.user.email}</p>
-                                                        </div>
-                                                        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                                                            <div className="rounded-2xl bg-slate-50 p-4">
-                                                                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Amount</p>
-                                                                <p className="mt-1 text-lg font-bold text-slate-900">₱{transaction.amount.toLocaleString()}</p>
-                                                            </div>
-                                                            <div className="rounded-2xl bg-slate-50 p-4">
-                                                                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Account</p>
-                                                                <p className="mt-1 text-sm font-medium text-slate-900">{transaction.savings?.account_number}</p>
-                                                            </div>
-                                                            <div className="rounded-2xl bg-slate-50 p-4">
-                                                                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Current Balance</p>
-                                                                <p className="mt-1 text-sm font-medium text-slate-900">₱{transaction.savings?.balance.toLocaleString()}</p>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div className="flex flex-col gap-3 lg:min-w-[200px]">
-                                                        <button
-                                                            onClick={() => approveWithdrawal(transaction.id)}
-                                                            className="inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-green-500 to-green-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-green-500/25 transition hover:from-green-600 hover:to-green-700 hover:shadow-xl hover:shadow-green-500/30"
-                                                        >
-                                                            <span className="mr-2">✓</span>
-                                                            Approve
-                                                        </button>
-                                                        <button
-                                                            onClick={() => rejectWithdrawal(transaction.id)}
-                                                            className="inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-red-500 to-red-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-red-500/25 transition hover:from-red-600 hover:to-red-700 hover:shadow-xl hover:shadow-red-500/30"
-                                                        >
-                                                            <span className="mr-2">✗</span>
-                                                            Reject
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))}
+
+                    <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-lg shadow-slate-200/50 mt-8">
+                        <div className="border-b border-slate-200 px-6 py-4 sm:px-8">
+                            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                                <div>
+                                    <h3 className="text-lg font-semibold text-slate-900">All Savings Transactions</h3>
+                                    <p className="text-sm text-slate-500">Complete savings activity for all users, sorted by latest transaction date.</p>
                                 </div>
                             </div>
                         </div>
-                    )}
+
+                        <div className="overflow-x-auto">
+                            <table className="min-w-full divide-y divide-slate-200">
+                                <thead className="bg-slate-50">
+                                    <tr>
+                                        <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">#</th>
+                                        <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Transaction ID</th>
+                                        <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">User</th>
+                                        <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Account</th>
+                                        <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Type</th>
+                                        <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Amount</th>
+                                        <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Balance After</th>
+                                        <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Status</th>
+                                        <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-100 bg-white">
+                                    {transactions.data.map((transaction, index) => {
+                                        const isCredit = transaction.type === 'deposit' || transaction.type === 'money_earned';
+                                        const typeLabel = transaction.type === 'deposit'
+                                            ? 'Deposit'
+                                            : transaction.type === 'money_earned'
+                                                ? 'Premium Income'
+                                                : 'Withdrawal';
+
+                                        return (
+                                            <tr key={transaction.id} className="hover:bg-slate-50">
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600">{index + 1}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">{transaction.reference_number}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
+                                                    {transaction.user?.name || 'N/A'}
+                                                    <div className="text-xs text-slate-500">{transaction.user?.email}</div>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900 font-mono">{transaction.savings?.account_number || 'N/A'}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">{typeLabel}</td>
+                                                <td className={`px-6 py-4 whitespace-nowrap text-sm font-semibold ${isCredit ? 'text-green-600' : 'text-red-600'}`}>
+                                                    {isCredit ? '+' : '-'}{formatCurrency(transaction.amount)}
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">{formatCurrency(transaction.balance_after)}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
+                                                        transaction.status === 'completed' ? 'bg-green-100 text-green-800' :
+                                                        transaction.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                                                        'bg-red-100 text-red-800'
+                                                    }`}>
+                                                        {transaction.status?.charAt(0).toUpperCase() + transaction.status?.slice(1)}
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600">{new Date(transaction.transaction_date).toLocaleDateString()}</td>
+                                            </tr>
+                                        );
+                                    })}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {transactions.links && transactions.links.length > 3 && (
+                            <div className="px-6 py-6 sm:px-8">
+                                <div className="flex flex-wrap items-center justify-center gap-2">
+                                    {transactions.links.map((link, index) => (
+                                        <Link
+                                            key={index}
+                                            href={link.url}
+                                            className={`inline-flex items-center rounded-2xl px-4 py-2 text-sm font-semibold transition ${
+                                                link.active
+                                                    ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/25'
+                                                    : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 hover:border-slate-300'
+                                            }`}
+                                            dangerouslySetInnerHTML={{ __html: link.label }}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
         </AuthenticatedLayout>

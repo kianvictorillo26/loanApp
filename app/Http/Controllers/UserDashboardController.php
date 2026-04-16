@@ -13,6 +13,7 @@ class UserDashboardController extends Controller
     public function index()
     {
         $user = Auth::user();
+        $this->checkPremiumSavingsDowngrade($user);
 
         // Redirect admin to admin dashboard
         if ($user->is_admin) {

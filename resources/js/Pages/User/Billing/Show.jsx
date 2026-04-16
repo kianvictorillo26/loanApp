@@ -126,7 +126,7 @@ export default function ShowBilling({ billing }) {
 
                 {/* Payment Instructions */}
                 <div className="mb-10 rounded-3xl border border-blue-200 bg-blue-50 p-8">
-                    <h3 className="text-lg font-semibold text-blue-900 mb-4">📋 Payment Information</h3>
+                    <h3 className="text-lg font-semibold text-blue-900 mb-4">Payment Information</h3>
                     <ul className="space-y-2 text-sm text-blue-800">
                         <li>• <strong>Payment Method:</strong> Online banking or cash deposit</li>
                         <li>• <strong>Due Date:</strong> Day of month specified above</li>

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, router, useForm } from '@inertiajs/react';
 
 export default function LoansIndex({ loans }) {
     const { data, setData, post, processing, errors } = useForm({
@@ -32,6 +32,10 @@ export default function LoansIndex({ loans }) {
             onSuccess: () => {
                 setData('interest_rate', '');
                 setData('term_months', '');
+                router.reload();
+            },
+            onError: () => {
+                alert('Unable to approve loan. Please check the values and try again.');
             },
         });
     };
@@ -44,14 +48,18 @@ export default function LoansIndex({ loans }) {
             return;
         }
 
-        post(route('admin.loans.reject', loanId), {
-            data: { reason },
+        router.post(route('admin.loans.reject', loanId), { reason }, {
             preserveScroll: true,
             onSuccess: () => {
                 setRejectReasons((prev) => ({
                     ...prev,
                     [loanId]: '',
                 }));
+                router.reload();
+            },
+            onError: (errors) => {
+                const message = errors.reason ? errors.reason : 'Unable to reject loan. Please try again.';
+                alert(message);
             },
         });
     };
@@ -202,6 +210,7 @@ export default function LoansIndex({ loans }) {
                                                             <div className="space-y-2">
                                                                 <div className="flex items-center gap-3">
                                                                     <button
+                                                                        type="button"
                                                                         onClick={() => approveLoan(loan.id)}
                                                                         className="inline-flex items-center rounded-2xl bg-green-600 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-green-700 transition disabled:opacity-50"
                                                                         disabled={processing}
@@ -209,8 +218,10 @@ export default function LoansIndex({ loans }) {
                                                                         ✓ Approve
                                                                     </button>
                                                                     <button
+                                                                        type="button"
                                                                         onClick={() => rejectLoan(loan.id)}
-                                                                        className="inline-flex items-center rounded-2xl bg-red-600 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-red-700 transition"
+                                                                        className="inline-flex items-center rounded-2xl bg-red-600 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-red-700 transition disabled:opacity-50"
+                                                                        disabled={processing || !(rejectReasons[loan.id] ?? '').trim()}
                                                                     >
                                                                         ✗ Reject
                                                                     </button>

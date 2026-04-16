@@ -97,6 +97,26 @@ export default function AuthenticatedLayout({ header, children }) {
                 ),
             },
             {
+                name: 'Withdrawals',
+                href: route('admin.withdrawals.index'),
+                active: route().current('admin.withdrawals.*'),
+                icon: (
+                    <svg
+                        className="h-5 w-5"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                    >
+                        <path d="M12 3v12" />
+                        <path d="M8 11l4 4 4-4" />
+                        <path d="M4 21h16" />
+                    </svg>
+                ),
+            },
+            {
                 name: 'Reports',
                 href: route('admin.reports.index'),
                 active: route().current('admin.reports.*'),
@@ -157,6 +177,24 @@ export default function AuthenticatedLayout({ header, children }) {
                 ),
             },
             {
+                name: 'Savings',
+                href: route('user.savings.index'),
+                active: route().current('user.savings.index'),
+                icon: (
+                    <svg
+                        className="h-5 w-5"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                    >
+                        <path d="M4 7h16M4 12h16M4 17h16" />
+                    </svg>
+                ),
+            },
+            {
                 name: 'Transactions',
                 href: route('user.transactions.index'),
                 active: route().current('user.transactions.*'),
@@ -187,19 +225,7 @@ export default function AuthenticatedLayout({ header, children }) {
                 >
                     <div className="flex items-center justify-center">
                         <Link href="/" className="inline-flex items-center justify-center">
-                            <div className="flex h-12 w-12 items-center justify-center rounded-3xl bg-blue-600 text-white shadow-lg shadow-blue-600/20">
-                                <svg
-                                    className="h-6 w-6"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="2"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                >
-                                    <path d="M3 12l2-2 4 4 8-8 4 4v8H3z" />
-                                </svg>
-                            </div>
+                            <ApplicationLogo className="h-12 w-12 rounded-3xl bg-white p-2 object-contain shadow-lg shadow-slate-900/10" />
                         </Link>
                     </div>
 

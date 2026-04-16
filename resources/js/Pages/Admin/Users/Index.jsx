@@ -1,16 +1,26 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, router, useForm } from '@inertiajs/react';
 
 export default function UsersIndex({ users }) {
-    const { data, setData, put, processing, errors } = useForm({
+    const { data, setData, put, post, processing, errors } = useForm({
         account_type: '',
         status: '',
     });
 
     const updateUser = (userId, field, value) => {
+        if (field === 'status' && value === 'approved') {
+            post(route('admin.users.approve', userId), {
+                preserveScroll: true,
+                onSuccess: () => router.reload(),
+            });
+
+            return;
+        }
+
         put(route('admin.users.update', userId), {
             data: { [field]: value },
             preserveScroll: true,
+            onSuccess: () => router.reload(),
         });
     };
 
@@ -121,9 +131,12 @@ export default function UsersIndex({ users }) {
                                                         ₱{user.savings?.balance?.toLocaleString() || '0'}
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                                        <span className="inline-flex items-center rounded-2xl bg-slate-100 px-3 py-2 text-xs font-semibold text-slate-600">
-                                                            Review profile below
-                                                        </span>
+                                                        <Link
+                                                            href={route('admin.users.show', user.id)}
+                                                            className="inline-flex items-center rounded-2xl bg-blue-600 px-4 py-2 text-xs font-semibold text-white transition hover:bg-blue-700"
+                                                        >
+                                                            View Details
+                                                        </Link>
                                                     </td>
                                                 </tr>
                                             ))}

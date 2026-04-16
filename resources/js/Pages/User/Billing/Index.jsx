@@ -206,7 +206,7 @@ export default function BillingIndex({ currentBilling, billingHistory, loanInfo 
 
                 {/* Info Box */}
                 <div className="mt-10 rounded-3xl border border-blue-200 bg-blue-50 p-6 sm:p-8">
-                    <h3 className="text-lg font-semibold text-blue-900 mb-4">📋 Billing Information</h3>
+                    <h3 className="text-lg font-semibold text-blue-900 mb-4">Billing Information</h3>
                     <div className="grid gap-4 sm:grid-cols-2">
                         <div>
                             <p className="text-xs font-semibold text-blue-600 mb-2">Payment Details</p>

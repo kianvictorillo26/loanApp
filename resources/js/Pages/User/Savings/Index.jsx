@@ -1,15 +1,29 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, usePage } from '@inertiajs/react';
+import { useMemo, useState } from 'react';
 
 export default function SavingsIndex({ savings, savingsHistory, minTransaction,  maxTransaction, maxBalance }) {
     const pageProps = usePage().props;
     const flash = pageProps.flash ?? {};
-    
+    const [filterType, setFilterType] = useState('all');
+    const [searchId, setSearchId] = useState('');
+
     const formatCurrency = (value) =>
         value !== null && value !== undefined ? Number(value).toLocaleString('en-US', { style: 'currency', currency: 'PHP' }) : '₱0.00';
 
     const savingsBalance = savings?.balance || 0;
     const percentageUsed = (savingsBalance / maxBalance) * 100;
+
+    const filteredTransactions = useMemo(() => {
+        const transactions = savingsHistory || [];
+        return transactions.filter((transaction) => {
+            const matchesType = filterType === 'all' || transaction.type === filterType;
+            const matchesSearch = searchId
+                ? transaction.reference_number?.toLowerCase().includes(searchId.toLowerCase())
+                : true;
+            return matchesType && matchesSearch;
+        });
+    }, [filterType, searchId, savingsHistory]);
 
     return (
         <AuthenticatedLayout
@@ -69,7 +83,7 @@ export default function SavingsIndex({ savings, savingsHistory, minTransaction, 
                                 </p>
                             </div>
 
-                            <div className="flex gap-3">
+                            <div className="flex flex-col gap-3 sm:flex-row">
                                 <Link
                                     href={route('user.savings.deposit')}
                                     className="flex-1 inline-flex items-center justify-center rounded-lg bg-purple-600 px-4 py-2 font-semibold text-white transition hover:bg-purple-700"
@@ -95,7 +109,7 @@ export default function SavingsIndex({ savings, savingsHistory, minTransaction, 
 
                 {/* Transaction Limits */}
                 <div className="mb-10 rounded-3xl border border-blue-200 bg-blue-50 p-6 sm:p-8">
-                    <h3 className="text-lg font-semibold text-blue-900 mb-4">📋 Savings Guidelines</h3>
+                    <h3 className="text-lg font-semibold text-blue-900 mb-4">Savings Guidelines</h3>
                     <div className="grid gap-4 sm:grid-cols-3">
                         <div>
                             <p className="text-xs font-semibold text-blue-600 mb-1">Per Transaction</p>
@@ -117,73 +131,94 @@ export default function SavingsIndex({ savings, savingsHistory, minTransaction, 
                 {/* Savings History */}
                 <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-lg shadow-slate-200/50">
                     <div className="border-b border-slate-200 px-6 py-4 sm:px-8">
-                        <div className="flex items-center justify-between">
-                            <h3 className="text-lg font-semibold text-slate-900">Transaction History</h3>
+                        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                            <div>
+                                <h3 className="text-lg font-semibold text-slate-900">Transaction History</h3>
+                                <p className="text-sm text-slate-500">All savings deposits, withdrawal requests, and premium income entries.</p>
+                            </div>
                             <Link
                                 href={route('user.transactions.index')}
                                 className="text-sm font-semibold text-purple-600 hover:text-purple-700"
                             >
-                                View all
+                                View all transactions
                             </Link>
                         </div>
                     </div>
 
-                    {savingsHistory && savingsHistory.length > 0 ? (
-                        <div className="divide-y divide-slate-100">
-                            {savingsHistory.map((transaction) => (
-                                <div key={transaction.id} className="flex items-center justify-between px-6 py-4 sm:px-8">
-                                    <div className="flex items-center gap-4 flex-1">
-                                        <div className={`flex h-10 w-10 items-center justify-center rounded-full ${
-                                            transaction.type === 'deposit' 
-                                                ? 'bg-green-100' 
-                                                : 'bg-red-100'
-                                        }`}>
-                                            <svg className={`h-5 w-5 ${
-                                                transaction.type === 'deposit'
-                                                    ? 'text-green-600'
-                                                    : 'text-red-600'
-                                            }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                {transaction.type === 'deposit' ? (
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                                                ) : (
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
-                                                )}
-                                            </svg>
-                                        </div>
-                                        <div>
-                                            <p className="text-sm font-semibold text-slate-900 capitalize">
-                                                {transaction.type === 'deposit' ? 'Savings Deposit' : 'Savings Withdrawal'}
-                                            </p>
-                                            <div className="flex items-center gap-2">
-                                                <p className="text-xs text-slate-500">
-                                                    {new Date(transaction.transaction_date).toLocaleDateString()}
-                                                </p>
-                                                <span className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
+                    <div className="px-6 py-4 sm:px-8">
+                        <div className="grid gap-4 md:grid-cols-3">
+                            <div>
+                                <label className="block text-sm font-semibold text-slate-700 mb-2">Filter by Category</label>
+                                <select
+                                    value={filterType}
+                                    onChange={(e) => setFilterType(e.target.value)}
+                                    className="w-full rounded-lg border border-slate-300 px-4 py-2 text-slate-900 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                                >
+                                    <option value="all">All</option>
+                                    <option value="deposit">Deposit</option>
+                                    <option value="withdrawal">Withdrawal</option>
+                                </select>
+                            </div>
+                            <div className="md:col-span-2">
+                                <label className="block text-sm font-semibold text-slate-700 mb-2">Search by Transaction ID</label>
+                                <input
+                                    type="text"
+                                    value={searchId}
+                                    onChange={(e) => setSearchId(e.target.value)}
+                                    placeholder="Search transaction ID"
+                                    className="w-full rounded-lg border border-slate-300 px-4 py-2 text-slate-900 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="overflow-x-auto">
+                        <table className="min-w-full divide-y divide-slate-200">
+                            <thead className="bg-slate-50">
+                                <tr>
+                                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">No.</th>
+                                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Transaction ID</th>
+                                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Category</th>
+                                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Amount</th>
+                                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Status</th>
+                                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Date</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100 bg-white">
+                                {filteredTransactions.map((transaction, index) => {
+                                    const isCredit = transaction.type === 'deposit' || transaction.type === 'money_earned';
+                                    const typeLabel = transaction.type === 'deposit'
+                                        ? 'Deposit'
+                                        : transaction.type === 'money_earned'
+                                            ? 'Premium Income'
+                                            : 'Withdrawal';
+                                    return (
+                                        <tr key={transaction.id} className="hover:bg-slate-50">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600">{index + 1}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">{transaction.reference_number}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">{typeLabel}</td>
+                                            <td className={`px-6 py-4 whitespace-nowrap text-sm font-semibold ${isCredit ? 'text-green-600' : 'text-red-600'}`}>
+                                                {isCredit ? '+' : '-'}{formatCurrency(transaction.amount)}
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
                                                     transaction.status === 'completed' ? 'bg-green-100 text-green-800' :
                                                     transaction.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
                                                     'bg-red-100 text-red-800'
                                                 }`}>
                                                     {transaction.status?.charAt(0).toUpperCase() + transaction.status?.slice(1)}
                                                 </span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <p className={`text-sm font-semibold ${
-                                        transaction.type === 'deposit'
-                                            ? 'text-green-600'
-                                            : 'text-red-600'
-                                    }`}>
-                                        {transaction.type === 'deposit' ? '+' : '-'}
-                                        {formatCurrency(transaction.amount)}
-                                    </p>
-                                </div>
-                            ))}
-                        </div>
-                    ) : (
-                        <div className="px-6 py-12 text-center sm:px-8">
-                            <p className="text-slate-500">No savings transactions yet</p>
-                        </div>
-                    )}
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600">{new Date(transaction.transaction_date).toLocaleDateString()}</td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
+                        {filteredTransactions.length === 0 && (
+                            <div className="px-6 py-12 text-center text-slate-500">No transactions match your filters.</div>
+                        )}
+                    </div>
                 </div>
             </div>
         </AuthenticatedLayout>

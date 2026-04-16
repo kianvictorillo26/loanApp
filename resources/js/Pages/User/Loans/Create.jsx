@@ -169,7 +169,7 @@ export default function CreateLoan() {
 
                         {/* Important Notes */}
                         <div className="rounded-2xl border border-yellow-200 bg-yellow-50 p-6">
-                            <h3 className="text-sm font-semibold text-yellow-900 mb-3">⚠️ Important Information</h3>
+                            <h3 className="text-sm font-semibold text-yellow-900 mb-3">Important Information</h3>
                             <ul className="space-y-2 text-xs text-yellow-800">
                                 <li>• 3% interest will be deducted from your loan amount immediately</li>
                                 <li>• You will receive the net amount (loan - interest)</li>

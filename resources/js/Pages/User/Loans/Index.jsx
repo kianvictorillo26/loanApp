@@ -192,6 +192,8 @@ export default function LoansIndex({ loans, maxLoanAmount, currentTotalLoan }) {
                     <ul className="space-y-2 text-sm text-blue-800">
                         <li>• Minimum loan amount: ₱5,000</li>
                         <li>• Maximum loan amount: ₱10,000 per application</li>
+                        <li>• Total approved loan balance may not exceed ₱50,000</li>
+                        <li>• Amount must be in thousands (₱5,000, ₱6,000, ₱7,000, etc.)</li>
                         <li>• Interest rate: 3% (charged upfront)</li>
                         <li>• Loan terms: 1, 3, 6, or 12 months</li>
                         <li>• Loans can be increased after on-time payments</li>

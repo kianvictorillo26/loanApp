@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\BlockedEmail;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
@@ -36,6 +37,11 @@ class RegisteredUserController extends Controller
             if ($premiumCount >= 50) {
                 return back()->withErrors(['account_type' => 'Maximum 50 Premium accounts allowed.']);
             }
+        }
+
+        $normalizedEmail = strtolower($request->email);
+        if (BlockedEmail::where('email', $normalizedEmail)->exists()) {
+            return back()->withErrors(['email' => 'This email address has been blocked from registering.']);
         }
 
         $request->validate([
@@ -79,7 +85,7 @@ class RegisteredUserController extends Controller
             'gender' => $request->gender,
             'birthday' => $request->birthday,
             'age' => $age,
-            'email' => $request->email,
+            'email' => $normalizedEmail,
             'contact_number' => $request->contact_number,
             'bank_name' => $request->bank_name,
             'bank_account_number' => $request->bank_account_number,

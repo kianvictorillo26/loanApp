@@ -131,7 +131,7 @@ export default function DepositSavings({ savingsBalance, currentBalance, minTran
 
                         {/* Info Box */}
                         <div className="rounded-2xl border border-blue-200 bg-blue-50 p-6">
-                            <h3 className="text-sm font-semibold text-blue-900 mb-3">ℹ️ Savings Information</h3>
+                            <h3 className="text-sm font-semibold text-blue-900 mb-3">Savings Information</h3>
                             <ul className="space-y-2 text-xs text-blue-800">
                                 <li>• Deposits are processed immediately</li>
                                 <li>• Money earned (2% company income) is added automatically</li>

@@ -21,7 +21,8 @@ class SavingsController extends Controller
     public function index()
     {
         $user = Auth::user();
-        
+        $this->checkPremiumSavingsDowngrade($user);
+
         $savings = Savings::firstOrCreate(
             ['user_id' => $user->id],
             [
@@ -31,12 +32,11 @@ class SavingsController extends Controller
             ]
         );
 
-        // Get recent transactions
+        // Get all savings transactions
         $savingsHistory = Transaction::where('user_id', $user->id)
             ->where('savings_id', $savings->id)
-            ->whereIn('type', ['deposit', 'withdrawal'])
+            ->whereIn('type', ['deposit', 'withdrawal', 'money_earned'])
             ->orderBy('transaction_date', 'desc')
-            ->limit(10)
             ->get();
 
         // Count remaining withdrawals for today
@@ -64,9 +64,17 @@ class SavingsController extends Controller
     public function deposit()
     {
         $user = Auth::user();
+        $this->checkPremiumSavingsDowngrade($user);
         
-        $savings = Savings::where('user_id', $user->id)->first();
-        $currentBalance = $savings?->balance ?? 0;
+        $savings = Savings::firstOrCreate(
+            ['user_id' => $user->id],
+            [
+                'account_number' => 'SAV' . str_pad($user->id, 8, '0', STR_PAD_LEFT),
+                'balance' => 0,
+                'status' => 'active'
+            ]
+        );
+        $currentBalance = $savings->balance;
 
         return Inertia::render('User/Savings/Deposit', [
             'currentBalance' => $currentBalance,
@@ -84,7 +92,14 @@ class SavingsController extends Controller
             'amount' => 'required|numeric|min:' . self::MIN_DEPOSIT . '|max:' . self::MAX_DEPOSIT,
         ]);
 
-        $savings = Savings::where('user_id', $user->id)->first();
+        $savings = Savings::firstOrCreate(
+            ['user_id' => $user->id],
+            [
+                'account_number' => 'SAV' . str_pad($user->id, 8, '0', STR_PAD_LEFT),
+                'balance' => 0,
+                'status' => 'active'
+            ]
+        );
         
         // Check if deposit would exceed maximum
         if (($savings->balance + $validated['amount']) > self::MAX_SAVINGS) {
@@ -93,6 +108,7 @@ class SavingsController extends Controller
 
         // Update savings balance
         $savings->increment('balance', $validated['amount']);
+        $savings->refresh();
 
         // Create transaction
         Transaction::create([
@@ -102,7 +118,7 @@ class SavingsController extends Controller
             'amount' => $validated['amount'],
             'balance_after' => $savings->balance,
             'status' => 'completed',
-            'reference_number' => 'TXN' . date('Ymd') . str_pad(Transaction::where('user_id', $user->id)->count() + 1, 6, '0', STR_PAD_LEFT),
+            'reference_number' => Transaction::generateReferenceNumber('TXN'),
             'transaction_date' => now(),
         ]);
 
@@ -112,9 +128,17 @@ class SavingsController extends Controller
     public function withdraw()
     {
         $user = Auth::user();
+        $this->checkPremiumSavingsDowngrade($user);
         
-        $savings = Savings::where('user_id', $user->id)->first();
-        $currentBalance = $savings?->balance ?? 0;
+        $savings = Savings::firstOrCreate(
+            ['user_id' => $user->id],
+            [
+                'account_number' => 'SAV' . str_pad($user->id, 8, '0', STR_PAD_LEFT),
+                'balance' => 0,
+                'status' => 'active'
+            ]
+        );
+        $currentBalance = $savings->balance;
 
         // Count withdrawals today
         $withdrawalsToday = Transaction::where('user_id', $user->id)
@@ -142,7 +166,14 @@ class SavingsController extends Controller
             'amount' => 'required|numeric|min:' . self::MIN_WITHDRAWAL . '|max:' . self::MAX_WITHDRAWAL,
         ]);
 
-        $savings = Savings::where('user_id', $user->id)->first();
+        $savings = Savings::firstOrCreate(
+            ['user_id' => $user->id],
+            [
+                'account_number' => 'SAV' . str_pad($user->id, 8, '0', STR_PAD_LEFT),
+                'balance' => 0,
+                'status' => 'active'
+            ]
+        );
         
         // Check balance
         if ($validated['amount'] > $savings->balance) {
@@ -167,7 +198,7 @@ class SavingsController extends Controller
             'amount' => $validated['amount'],
             'balance_after' => $savings->balance - $validated['amount'],
             'status' => 'pending',
-            'reference_number' => 'TXN' . date('Ymd') . str_pad($savings->id, 6, '0', STR_PAD_LEFT),
+            'reference_number' => Transaction::generateReferenceNumber('TXN'),
             'transaction_date' => now(),
         ]);
 

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class Transaction extends Model
 {
@@ -43,8 +44,17 @@ class Transaction extends Model
         return $this->belongsTo(Loan::class);
     }
 
-    public function generateReferenceNumber()
+    public static function generateReferenceNumber(string $prefix = 'TXN'): string
     {
-        return 'TXN' . date('Ymd') . str_pad($this->id, 6, '0', STR_PAD_LEFT);
+        return strtoupper($prefix . '-' . Str::random(6) . '-' . now()->format('YmdHis'));
+    }
+
+    protected static function booted()
+    {
+        static::creating(function ($transaction) {
+            if (empty($transaction->reference_number)) {
+                $transaction->reference_number = self::generateReferenceNumber();
+            }
+        });
     }
 }
