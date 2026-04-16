@@ -191,9 +191,12 @@ export default function SavingsIndex({ savings, transactions }) {
                                                                 </svg>
                                                                 Deposit
                                                             </button>
-                                                            <span className="inline-flex items-center rounded-2xl bg-slate-100 px-4 py-2 text-xs font-semibold text-slate-600">
+                                                            <Link
+                                                                href={route('admin.savings.show', account.id)}
+                                                                className="inline-flex items-center rounded-2xl bg-slate-100 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-200 transition"
+                                                            >
                                                                 Manage account
-                                                            </span>
+                                                            </Link>
                                                         </div>
                                                     </td>
                                                 </tr>

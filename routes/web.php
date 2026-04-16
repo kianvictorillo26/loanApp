@@ -56,6 +56,8 @@ Route::middleware(['auth', EnsureUserIsAdmin::class])->prefix('admin')->name('ad
     // Savings Management
     Route::get('/savings', [AdminDashboardController::class, 'savings'])
         ->name('savings.index');
+    Route::get('/savings/{savings}', [AdminDashboardController::class, 'showSavings'])
+        ->name('savings.show');
     Route::get('/withdrawals', [AdminDashboardController::class, 'withdrawals'])
         ->name('withdrawals.index');
     Route::post('/withdrawals/{transaction}/approve', [AdminDashboardController::class, 'approveWithdrawal'])

@@ -1,7 +1,10 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link, usePage } from '@inertiajs/react';
+import { useState } from 'react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 
 export default function AdminDashboard({ pendingUsers, pendingLoans, pendingWithdrawals, counts }) {
+    const [confirmDistribution, setConfirmDistribution] = useState(false);
+    const [isDistributing, setIsDistributing] = useState(false);
     const pageProps = usePage().props;
     const flash = pageProps.flash ?? {};
     const auth = pageProps.auth ?? {};
@@ -180,12 +183,7 @@ export default function AdminDashboard({ pendingUsers, pendingLoans, pendingWith
                                     <p className="mt-1 text-sm text-slate-500">Handle withdrawals</p>
                                 </div>
                             </Link>
-                            <Link
-                                href={route('admin.distribute-premium-income')}
-                                method="post"
-                                as="button"
-                                className="group relative overflow-hidden rounded-3xl border border-slate-200 bg-gradient-to-br from-white to-slate-50 p-6 shadow-lg shadow-slate-200/50 transition-all hover:shadow-xl hover:shadow-amber-200/50 hover:-translate-y-1"
-                            >
+                            <div className="group relative overflow-hidden rounded-3xl border border-slate-200 bg-gradient-to-br from-white to-slate-50 p-6 shadow-lg shadow-slate-200/50 transition-all hover:shadow-xl hover:shadow-amber-200/50 hover:-translate-y-1">
                                 <div className="absolute -right-6 -top-6 h-20 w-20 rounded-full bg-amber-100/60 blur-2xl transition group-hover:bg-amber-200/60" />
                                 <div className="relative text-center">
                                     <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-3xl bg-amber-100 text-3xl transition group-hover:bg-amber-200">
@@ -194,9 +192,30 @@ export default function AdminDashboard({ pendingUsers, pendingLoans, pendingWith
                                         </svg>
                                     </div>
                                     <p className="font-semibold text-slate-900">Distribute Premium Income</p>
-                                    <p className="mt-1 text-sm text-slate-500">Add bonus to approved Premium users</p>
+                                    <p className="mt-1 text-sm text-slate-500">Share company earnings with approved Premium members.</p>
+                                    <div className="mt-6 text-center">
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                if (!confirmDistribution) {
+                                                    setConfirmDistribution(true);
+                                                    return;
+                                                }
+
+                                                setIsDistributing(true);
+                                                router.post(route('admin.distribute-premium-income'), {
+                                                    preserveScroll: true,
+                                                    onFinish: () => setIsDistributing(false),
+                                                });
+                                            }}
+                                            disabled={isDistributing}
+                                            className="inline-flex items-center justify-center rounded-2xl bg-amber-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-amber-500/25 transition hover:bg-amber-600 hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-60"
+                                        >
+                                            {confirmDistribution ? (isDistributing ? 'Distributing...' : 'Confirm Distribution') : 'Distribute Now'}
+                                        </button>
+                                    </div>
                                 </div>
-                            </Link>
+                            </div>
                             <Link
                                 href="#pending-registrations"
                                 className="group relative overflow-hidden rounded-3xl border border-slate-200 bg-gradient-to-br from-white to-slate-50 p-6 shadow-lg shadow-slate-200/50 transition-all hover:shadow-xl hover:shadow-purple-200/50 hover:-translate-y-1"

@@ -246,6 +246,21 @@ class AdminDashboardController extends Controller
         ]);
     }
 
+    public function showSavings(Savings $savings): Response
+    {
+        $savings->load(['user']);
+
+        $transactions = $savings->transactions()
+            ->with('user')
+            ->orderBy('transaction_date', 'desc')
+            ->paginate(20);
+
+        return Inertia::render('Admin/Savings/Show', [
+            'savings' => $savings,
+            'transactions' => $transactions,
+        ]);
+    }
+
     public function withdrawals(): Response
     {
         $pendingWithdrawals = Transaction::with(['user', 'savings'])
