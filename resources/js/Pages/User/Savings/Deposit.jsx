@@ -7,15 +7,19 @@ export default function DepositSavings({ savingsBalance, currentBalance, minTran
         amount: '',
     });
 
-    const [remainingCapacity, setRemainingCapacity] = useState(maxBalance - currentBalance);
+    const currentBalanceNumeric = Number(currentBalance) || 0;
+    const maxBalanceNumeric = Number(maxBalance) || 0;
+    const [remainingCapacity, setRemainingCapacity] = useState(maxBalanceNumeric - currentBalanceNumeric);
 
     const formatCurrency = (value) =>
         value !== null && value !== undefined ? Number(value).toLocaleString('en-US', { style: 'currency', currency: 'PHP' }) : '₱0.00';
 
     const handleAmountChange = (value) => {
-        setData('amount', value);
-        if (value) {
-            const remaining = maxBalance - currentBalance - parseFloat(value);
+        const amountValue = value === '' ? '' : Number(value);
+        setData('amount', amountValue);
+
+        if (value !== '' && !Number.isNaN(amountValue)) {
+            const remaining = maxBalanceNumeric - currentBalanceNumeric - amountValue;
             setRemainingCapacity(Math.max(0, remaining));
         }
     };
@@ -25,10 +29,11 @@ export default function DepositSavings({ savingsBalance, currentBalance, minTran
         post(route('user.savings.store-deposit'));
     };
 
-    const isValidAmount = data.amount && 
-        parseFloat(data.amount) >= minTransaction && 
-        parseFloat(data.amount) <= maxTransaction &&
-        (currentBalance + parseFloat(data.amount)) <= maxBalance;
+    const enteredAmount = Number(data.amount) || 0;
+    const isValidAmount = data.amount !== '' &&
+        enteredAmount >= minTransaction &&
+        enteredAmount <= maxTransaction &&
+        (currentBalanceNumeric + enteredAmount) <= maxBalanceNumeric;
 
     return (
         <AuthenticatedLayout
@@ -60,7 +65,7 @@ export default function DepositSavings({ savingsBalance, currentBalance, minTran
                         <div>
                             <p className="text-xs font-semibold text-slate-500 uppercase">Available Capacity</p>
                             <p className="mt-2 text-3xl font-bold text-emerald-600">
-                                {formatCurrency(Math.max(0, maxBalance - currentBalance))}
+                                {formatCurrency(Math.max(0, maxBalanceNumeric - currentBalanceNumeric))}
                             </p>
                         </div>
                         <div>
@@ -85,7 +90,7 @@ export default function DepositSavings({ savingsBalance, currentBalance, minTran
                                 value={data.amount}
                                 onChange={(e) => handleAmountChange(e.target.value)}
                                 min={minTransaction}
-                                max={Math.min(maxTransaction, maxBalance - currentBalance)}
+                                max={Math.min(maxTransaction, maxBalanceNumeric - currentBalanceNumeric)}
                                 step="100"
                                 placeholder={`Enter amount between ${formatCurrency(minTransaction)} - ${formatCurrency(maxTransaction)}`}
                                 className="w-full rounded-lg border border-slate-300 px-4 py-3 text-slate-900 placeholder-slate-400 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
@@ -98,7 +103,7 @@ export default function DepositSavings({ savingsBalance, currentBalance, minTran
                                 <br />
                                 • Maximum per transaction: {formatCurrency(maxTransaction)}
                                 <br />
-                                • Max allowed for this deposit: {formatCurrency(Math.min(maxTransaction, maxBalance - currentBalance))}
+                                • Max allowed for this deposit: {formatCurrency(Math.min(maxTransaction, maxBalanceNumeric - currentBalanceNumeric))}
                             </p>
                         </div>
 
@@ -110,7 +115,7 @@ export default function DepositSavings({ savingsBalance, currentBalance, minTran
                                     <div>
                                         <p className="text-xs font-semibold text-purple-600">Current Balance</p>
                                         <p className="mt-1 text-lg font-bold text-slate-900">
-                                            {formatCurrency(currentBalance)}
+                                            {formatCurrency(currentBalanceNumeric)}
                                         </p>
                                     </div>
                                     <div>
@@ -122,7 +127,7 @@ export default function DepositSavings({ savingsBalance, currentBalance, minTran
                                     <div className="sm:col-span-2 border-t border-purple-200 pt-4">
                                         <p className="text-xs font-semibold text-purple-600">New Balance</p>
                                         <p className="mt-1 text-xl font-bold text-purple-600">
-                                            {formatCurrency(currentBalance + parseFloat(data.amount || 0))}
+                                            {formatCurrency(currentBalanceNumeric + enteredAmount)}
                                         </p>
                                     </div>
                                 </div>

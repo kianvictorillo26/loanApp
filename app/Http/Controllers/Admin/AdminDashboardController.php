@@ -95,6 +95,22 @@ class AdminDashboardController extends Controller
             'status' => 'sometimes|required|in:pending,approved,rejected',
         ]);
 
+        if ($request->filled('account_type')) {
+            if ($request->account_type === 'Premium' && $user->account_type !== 'Premium') {
+                $premiumCount = User::where('account_type', 'Premium')->count();
+                if ($premiumCount >= 50) {
+                    return back()->withErrors(['account_type' => 'Maximum 50 Premium accounts allowed.']);
+                }
+            }
+
+            if ($request->account_type === 'Basic' && $user->account_type === 'Premium') {
+                $savings = $user->savings;
+                if ($savings && $savings->balance > 0) {
+                    return back()->withErrors(['account_type' => 'Cannot downgrade to Basic while user has a savings balance.']);
+                }
+            }
+        }
+
         $user->update($request->only(['account_type', 'status']));
 
         return back()->with('success', 'User updated successfully.');

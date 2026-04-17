@@ -4,6 +4,8 @@ import { useState } from 'react';
 
 export default function TransactionsIndex({ transactions }) {
     const pageProps = usePage().props;
+    const user = pageProps.auth?.user ?? {};
+    const isPremium = user.account_type?.toLowerCase() === 'premium';
     const [filterType, setFilterType] = useState('all');
     const [searchId, setSearchId] = useState('');
 
@@ -96,13 +98,17 @@ export default function TransactionsIndex({ transactions }) {
                                 className="w-full rounded-lg border border-slate-300 px-4 py-2 text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                             >
                                 <option value="all">All Transactions</option>
-                                <option value="deposit">Deposits Only</option>
-                                <option value="withdrawal">Withdrawals Only</option>
                                 <option value="loan_disbursement">Loan Disbursements</option>
                                 <option value="loan_payment">Loan Payments</option>
-                                <option value="money_earned">Money Earned</option>
                                 <option value="interest">Interest Charges</option>
                                 <option value="penalty">Penalties</option>
+                                {isPremium && (
+                                    <>
+                                        <option value="deposit">Deposits Only</option>
+                                        <option value="withdrawal">Withdrawals Only</option>
+                                        <option value="money_earned">Money Earned</option>
+                                    </>
+                                )}
                             </select>
                         </div>
 
@@ -222,60 +228,61 @@ export default function TransactionsIndex({ transactions }) {
                     )}
                 </div>
 
-                {/* Legend */}
-                <div className="mt-10 rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 shadow-lg shadow-slate-200/50">
-                    <h3 className="text-lg font-semibold text-slate-900 mb-4"> Transaction Types</h3>
-                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                        <div className="flex items-center gap-3">
-                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-100">
-                                <svg className="h-4 w-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                                </svg>
+                {isPremium && (
+                    <div className="mt-10 rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 shadow-lg shadow-slate-200/50">
+                        <h3 className="text-lg font-semibold text-slate-900 mb-4"> Transaction Types</h3>
+                        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                            <div className="flex items-center gap-3">
+                                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-100">
+                                    <svg className="h-4 w-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                    </svg>
+                                </div>
+                                <span className="text-sm text-slate-700">Deposit - Money added to savings</span>
                             </div>
-                            <span className="text-sm text-slate-700">Deposit - Money added to savings</span>
-                        </div>
-                        <div className="flex items-center gap-3">
-                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-red-100">
-                                <svg className="h-4 w-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
-                                </svg>
+                            <div className="flex items-center gap-3">
+                                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-red-100">
+                                    <svg className="h-4 w-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                                    </svg>
+                                </div>
+                                <span className="text-sm text-slate-700">Withdrawal - Money withdrawn from savings</span>
                             </div>
-                            <span className="text-sm text-slate-700">Withdrawal - Money withdrawn from savings</span>
-                        </div>
-                        <div className="flex items-center gap-3">
-                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100">
-                                <svg className="h-4 w-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
+                            <div className="flex items-center gap-3">
+                                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100">
+                                    <svg className="h-4 w-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </div>
+                                <span className="text-sm text-slate-700">Loan Disbursement - Loan amount received</span>
                             </div>
-                            <span className="text-sm text-slate-700">Loan Disbursement - Loan amount received</span>
-                        </div>
-                        <div className="flex items-center gap-3">
-                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-purple-100">
-                                <svg className="h-4 w-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
+                            <div className="flex items-center gap-3">
+                                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-purple-100">
+                                    <svg className="h-4 w-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </div>
+                                <span className="text-sm text-slate-700">Loan Payment - Monthly loan payment</span>
                             </div>
-                            <span className="text-sm text-slate-700">Loan Payment - Monthly loan payment</span>
-                        </div>
-                        <div className="flex items-center gap-3">
-                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-100">
-                                <svg className="h-4 w-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
+                            <div className="flex items-center gap-3">
+                                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-100">
+                                    <svg className="h-4 w-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </div>
+                                <span className="text-sm text-slate-700">Money Earned - Premium income added to savings</span>
                             </div>
-                            <span className="text-sm text-slate-700">Money Earned - Premium income added to savings</span>
-                        </div>
-                        <div className="flex items-center gap-3">
-                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-orange-100">
-                                <svg className="h-4 w-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
+                            <div className="flex items-center gap-3">
+                                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-orange-100">
+                                    <svg className="h-4 w-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </div>
+                                <span className="text-sm text-slate-700">Interest - Interest charged on loan</span>
                             </div>
-                            <span className="text-sm text-slate-700">Interest - Interest charged on loan</span>
                         </div>
                     </div>
-                </div>
+                )}
             </div>
         </AuthenticatedLayout>
     );

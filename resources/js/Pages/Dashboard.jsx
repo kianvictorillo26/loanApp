@@ -52,7 +52,7 @@ export default function Dashboard({ userStats, recentTransactions, currentBill, 
                                 {user.name}
                             </h1>
                             <p className="mt-3 max-w-xl text-sm leading-6 text-emerald-50">
-                                Manage your loans, savings, and track your financial progress all in one place.
+                                Manage your loans{user.account_type?.toLowerCase() === 'premium' ? ', savings,' : ''} and track your financial progress all in one place.
                             </p>
                         </div>
                         <div className="flex flex-col gap-2">
@@ -102,26 +102,27 @@ export default function Dashboard({ userStats, recentTransactions, currentBill, 
                         </div>
                     </div>
 
-                    {/* Savings Balance */}
-                    <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-gradient-to-br from-white to-slate-50 p-6 shadow-lg shadow-slate-200/50">
-                        <div className="absolute -right-4 -top-4 h-20 w-20 rounded-full bg-purple-100/60 blur-2xl" />
-                        <div className="relative">
-                            <div className="flex items-start justify-between">
-                                <div>
-                                    <p className="text-sm font-semibold text-slate-500">Savings Balance</p>
-                                    <p className="mt-3 text-3xl font-bold text-slate-900">
-                                        {formatCurrency(userStats?.savings_balance || 0)}
-                                    </p>
-                                    <p className="mt-2 text-xs text-slate-500">
-                                        Limit: {formatCurrency(100000)}
-                                    </p>
+                    {user.account_type?.toLowerCase() === 'premium' && (
+                        <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-gradient-to-br from-white to-slate-50 p-6 shadow-lg shadow-slate-200/50">
+                            <div className="absolute -right-4 -top-4 h-20 w-20 rounded-full bg-purple-100/60 blur-2xl" />
+                            <div className="relative">
+                                <div className="flex items-start justify-between">
+                                    <div>
+                                        <p className="text-sm font-semibold text-slate-500">Savings Balance</p>
+                                        <p className="mt-3 text-3xl font-bold text-slate-900">
+                                            {formatCurrency(userStats?.savings_balance || 0)}
+                                        </p>
+                                        <p className="mt-2 text-xs text-slate-500">
+                                            Limit: {formatCurrency(100000)}
+                                        </p>
+                                    </div>
+                                    <svg className="h-10 w-10 text-purple-500 opacity-50" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-5h3c1.1 0 2-.9 2-2v-3c0-1.1-.9-2-2-2zm0 5h-3v-3h3v3zM6 18c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z" />
+                                    </svg>
                                 </div>
-                                <svg className="h-10 w-10 text-purple-500 opacity-50" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-5h3c1.1 0 2-.9 2-2v-3c0-1.1-.9-2-2-2zm0 5h-3v-3h3v3zM6 18c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z" />
-                                </svg>
                             </div>
                         </div>
-                    </div>
+                    )}
 
                     {/* Money Earned */}
                     {user.account_type?.toLowerCase() === 'premium' && (

@@ -28,13 +28,15 @@ class UserDashboardController extends Controller
         $currentLoanAmount = $activeLoans->sum('amount');
         $loanBalance = $activeLoans->sum('remaining_balance');
         
-        // Get savings information
-        $savings = Savings::firstOrCreate(
-            ['user_id' => $user->id],
-            ['account_number' => 'SAV' . str_pad($user->id, 8, '0', STR_PAD_LEFT), 'balance' => 0]
-        );
-        
-        $savingsBalance = $savings->balance ?? 0;
+        // Get savings information only for Premium users
+        $savingsBalance = 0;
+        if ($user->account_type === 'Premium') {
+            $savings = Savings::firstOrCreate(
+                ['user_id' => $user->id],
+                ['account_number' => 'SAV' . str_pad($user->id, 8, '0', STR_PAD_LEFT), 'balance' => 0]
+            );
+            $savingsBalance = $savings->balance ?? 0;
+        }
         
         // Get money earned
         $moneyEarned = Transaction::where('user_id', $user->id)

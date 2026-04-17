@@ -90,7 +90,7 @@ Route::middleware('auth')->group(function () {
         });
 
         // User Savings Routes
-        Route::prefix('user/savings')->name('user.savings.')->group(function () {
+        Route::prefix('user/savings')->name('user.savings.')->middleware(\App\Http\Middleware\EnsureUserIsPremium::class)->group(function () {
             Route::get('/', [SavingsController::class, 'index'])->name('index');
             Route::get('/deposit', [SavingsController::class, 'deposit'])->name('deposit');
             Route::post('/deposit', [SavingsController::class, 'storeDeposit'])->name('store-deposit');

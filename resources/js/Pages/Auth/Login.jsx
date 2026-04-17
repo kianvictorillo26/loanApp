@@ -66,7 +66,7 @@ export default function Login({ status, canResetPassword }) {
                         <main className="mt-16 flex justify-center">
                             <div className="w-full max-w-md bg-white rounded-lg shadow-lg p-8">
                                 <div className="mb-8 text-center">
-                                    <h2 className="text-2xl font-bold text-slate-900">Welcome Palautang</h2>
+                                    <h2 className="text-2xl font-bold text-slate-900">Welcome! Manage your loans easily</h2>
                                     <p className="text-slate-600 mt-2">Sign in to your LoanApp account</p>
                                 </div>
 

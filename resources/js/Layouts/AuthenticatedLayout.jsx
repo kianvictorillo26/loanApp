@@ -176,24 +176,26 @@ export default function AuthenticatedLayout({ header, children }) {
                     </svg>
                 ),
             },
-            {
-                name: 'Savings',
-                href: route('user.savings.index'),
-                active: route().current('user.savings.index'),
-                icon: (
-                    <svg
-                        className="h-5 w-5"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                    >
-                        <path d="M4 7h16M4 12h16M4 17h16" />
-                    </svg>
-                ),
-            },
+            ...(user.account_type?.toLowerCase() === 'premium' ? [
+                {
+                    name: 'Savings',
+                    href: route('user.savings.index'),
+                    active: route().current('user.savings.index'),
+                    icon: (
+                        <svg
+                            className="h-5 w-5"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                        >
+                            <path d="M4 7h16M4 12h16M4 17h16" />
+                        </svg>
+                    ),
+                },
+            ] : []),
             {
                 name: 'Transactions',
                 href: route('user.transactions.index'),
