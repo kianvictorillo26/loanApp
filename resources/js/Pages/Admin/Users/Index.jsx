@@ -1,15 +1,10 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link, router, useForm } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 
 export default function UsersIndex({ users }) {
-    const { data, setData, put, post, processing, errors } = useForm({
-        account_type: '',
-        status: '',
-    });
-
     const updateUser = (userId, field, value) => {
         if (field === 'status' && value === 'approved') {
-            post(route('admin.users.approve', userId), {
+            router.post(route('admin.users.approve', userId), {
                 preserveScroll: true,
                 onSuccess: () => router.reload(),
             });
@@ -17,8 +12,7 @@ export default function UsersIndex({ users }) {
             return;
         }
 
-        put(route('admin.users.update', userId), {
-            data: { [field]: value },
+        router.put(route('admin.users.update', userId), { [field]: value }, {
             preserveScroll: true,
             onSuccess: () => router.reload(),
         });
@@ -106,7 +100,6 @@ export default function UsersIndex({ users }) {
                                                             value={user.account_type}
                                                             onChange={(e) => updateUser(user.id, 'account_type', e.target.value)}
                                                             className="rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:ring-blue-500 transition"
-                                                            disabled={processing}
                                                         >
                                                             <option value="Basic">Basic</option>
                                                             <option value="Premium">Premium</option>
@@ -117,7 +110,6 @@ export default function UsersIndex({ users }) {
                                                             value={user.status}
                                                             onChange={(e) => updateUser(user.id, 'status', e.target.value)}
                                                             className="rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:ring-blue-500 transition"
-                                                            disabled={processing}
                                                         >
                                                             <option value="pending">Pending</option>
                                                             <option value="approved">Approved</option>
