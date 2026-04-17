@@ -22,12 +22,15 @@ export default function WithdrawalsIndex({ pendingWithdrawals }) {
             return;
         }
 
-        router.post(route('admin.withdrawals.reject', transactionId), {
-            data: { reason: reason.trim() },
-            preserveScroll: true,
-            onSuccess: () => router.reload(),
-            onError: () => alert('Unable to reject withdrawal. Please try again.'),
-        });
+        router.post(
+            route('admin.withdrawals.reject', transactionId),
+            { reason: reason.trim() },
+            {
+                preserveScroll: true,
+                onSuccess: () => router.reload(),
+                onError: () => alert('Unable to reject withdrawal. Please try again.'),
+            }
+        );
     };
 
     return (

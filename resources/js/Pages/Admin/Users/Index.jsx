@@ -1,7 +1,11 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 
 export default function UsersIndex({ users }) {
+    const pageProps = usePage().props;
+    const errors = pageProps.errors || {};
+    const flash = pageProps.flash || {};
+
     const updateUser = (userId, field, value) => {
         if (field === 'status' && value === 'approved') {
             router.post(route('admin.users.approve', userId), {
@@ -56,6 +60,14 @@ export default function UsersIndex({ users }) {
                                 </div>
                             </div>
                             <div className="p-8">
+                                {(flash.success || flash.error || errors.account_type || errors.status) && (
+                                    <div className="mb-6 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm shadow-sm">
+                                        {flash.success && <p className="text-green-700">{flash.success}</p>}
+                                        {flash.error && <p className="text-red-700">{flash.error}</p>}
+                                        {errors.account_type && <p className="text-red-700">{errors.account_type}</p>}
+                                        {errors.status && <p className="text-red-700">{errors.status}</p>}
+                                    </div>
+                                )}
                                 <div className="overflow-x-auto">
                                     <table className="min-w-full divide-y divide-slate-200">
                                         <thead className="bg-slate-50">

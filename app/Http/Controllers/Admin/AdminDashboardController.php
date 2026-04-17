@@ -102,13 +102,6 @@ class AdminDashboardController extends Controller
                     return back()->withErrors(['account_type' => 'Maximum 50 Premium accounts allowed.']);
                 }
             }
-
-            if ($request->account_type === 'Basic' && $user->account_type === 'Premium') {
-                $savings = $user->savings;
-                if ($savings && $savings->balance > 0) {
-                    return back()->withErrors(['account_type' => 'Cannot downgrade to Basic while user has a savings balance.']);
-                }
-            }
         }
 
         $user->update($request->only(['account_type', 'status']));
